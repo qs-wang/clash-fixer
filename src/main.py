@@ -32,7 +32,7 @@ class ClashConfigFileHandler(FileSystemEventHandler):
         with open(event.src_path, "r+") as f:
             content = f.readlines()
             content.insert(-4, "# by Q.s. \n")
-            content.insert(-4, "- IP-CIDR,190.190.190.0/24,DIRECT \n")
+            content.insert(-4, "- IP-CIDR,190.190.190.0/24,DIRECT\n")
             content.insert(-4, "\n")
 
             self.__is_writing__ = True
