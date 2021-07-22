@@ -16,6 +16,7 @@ class ClashConfigFileHandler(FileSystemEventHandler):
         if self.__is_writing__:
             return
 
+        
         if event.is_directory:
             return
 
@@ -23,22 +24,33 @@ class ClashConfigFileHandler(FileSystemEventHandler):
 
         if not fname.endswith(".yaml"):
             return
-
+        
         if datetime.now() - self.last_modified < timedelta(seconds=1):
             return
         else:
             self.last_modified = datetime.now()
 
-        with open(event.src_path, "r+") as f:
+        self.__is_writing__ = True
+        with open(event.src_path, "r") as f:
             content = f.readlines()
-            content.insert(-4, "# by Q.s. \n")
-            content.insert(-4, "- IP-CIDR,190.190.190.0/24,DIRECT\n")
-            content.insert(-4, "\n")
 
-            self.__is_writing__ = True
+        content.insert(-4, "# by Q.s. \n")
+        content.insert(-4, "- IP-CIDR,190.190.190.0/24,DIRECT\n")
+        content.insert(-4, "\n")
+
+        has_skipped_line = False
+
+        with open(event.src_path, 'w') as fw:
             for line in content:
-                f.write(str(line))
-            self.__is_writing__ = False
+                if "- IP-CIDR,190.190.190.0/24,DIRECT" in line:
+                    if has_skipped_line:
+                        continue
+                    else:
+                        has_skipped_line = True
+                        
+                fw.write(str(line))
+
+        self.__is_writing__ = False   
 
 
 if __name__ == "__main__":
